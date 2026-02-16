@@ -4,7 +4,7 @@ import json
 from datetime import datetime, timezone
 
 # config
-NUM_VEHICLES = 50 # number of vehicles tracked
+NUM_VEHICLES = 500 # number of vehicles tracked
 PUBLISH_INTERVAL = 5  # publish data every 5s
 
 # Base GPS location (ex: depot)

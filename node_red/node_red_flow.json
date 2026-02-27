@@ -88,7 +88,8 @@
         "wires": [
             [
                 "6dfa23eb416e9b54",
-                "08bf259619ea09b1"
+                "08bf259619ea09b1",
+                "8ef90421c7787452"
             ]
         ]
     },
@@ -139,8 +140,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 660,
-        "y": 740,
+        "x": 640,
+        "y": 660,
         "wires": []
     },
     {
@@ -237,7 +238,9 @@
         "x": 1330,
         "y": 400,
         "wires": [
-            []
+            [
+                "0afa7e0d1a6a1ee0"
+            ]
         ]
     },
     {
@@ -313,8 +316,104 @@
         "x": 1330,
         "y": 320,
         "wires": [
-            []
+            [
+                "15f31b1a3a46cb0f"
+            ]
         ]
+    },
+    {
+        "id": "8ef90421c7787452",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Prepare Alert Firebase",
+        "func": "const BASE = \"https://fleet-monitoring-iot-default-rtdb.asia-southeast1.firebasedatabase.app\";\n\nmsg.url = `${BASE}/fleet/alerts/overspeed.json`;\n\n// msg.payload already contains the alert object\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 720,
+        "wires": [
+            [
+                "363055e957ccc905"
+            ]
+        ]
+    },
+    {
+        "id": "363055e957ccc905",
+        "type": "http request",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1270,
+        "y": 720,
+        "wires": [
+            [
+                "2d07345d3b0b14ea"
+            ]
+        ]
+    },
+    {
+        "id": "15f31b1a3a46cb0f",
+        "type": "debug",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1500,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "0afa7e0d1a6a1ee0",
+        "type": "debug",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1500,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "2d07345d3b0b14ea",
+        "type": "debug",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1440,
+        "y": 720,
+        "wires": []
     },
     {
         "id": "b84c3fdc3d5601dc",

@@ -42,7 +42,8 @@
             [
                 "5fd3b9e0620ebe15",
                 "5af85dfa6cb04637",
-                "3d3af01ca9c229a6"
+                "3d3af01ca9c229a6",
+                "c6e473259cb78185"
             ]
         ]
     },
@@ -75,7 +76,7 @@
         "id": "986b71178367ad70",
         "type": "function",
         "z": "43a1d45bd1f2ab4b",
-        "name": "function 1",
+        "name": "Overspeed alert formatted output",
         "func": "let vehicle = msg.payload.vehicle_id;\nlet speed = msg.payload.speed;\n\nmsg.payload = {\n    alert_type: \"OVERSPEED\",\n    vehicle_id: vehicle,\n    speed: speed,\n    threshold: 120,\n    timestamp: msg.payload.timestamp\n};\n\nmsg.topic = \"fleet/alerts/overspeed\";\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
@@ -83,13 +84,14 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 820,
+        "x": 900,
         "y": 580,
         "wires": [
             [
                 "6dfa23eb416e9b54",
                 "08bf259619ea09b1",
-                "8ef90421c7787452"
+                "8ef90421c7787452",
+                "a44a4af2ab064245"
             ]
         ]
     },
@@ -107,7 +109,7 @@
         "correl": "",
         "expiry": "",
         "broker": "cbe10e460caedeca",
-        "x": 1060,
+        "x": 1220,
         "y": 540,
         "wires": []
     },
@@ -123,7 +125,7 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1020,
+        "x": 1180,
         "y": 620,
         "wires": []
     },
@@ -140,7 +142,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 640,
+        "x": 660,
         "y": 660,
         "wires": []
     },
@@ -185,7 +187,7 @@
         "to": "",
         "reg": false,
         "x": 950,
-        "y": 400,
+        "y": 240,
         "wires": [
             [
                 "a6f1022b10d38829"
@@ -212,7 +214,7 @@
         "to": "",
         "reg": false,
         "x": 1140,
-        "y": 400,
+        "y": 240,
         "wires": [
             [
                 "4f599c3e1a577957"
@@ -236,7 +238,7 @@
         "senderr": false,
         "headers": [],
         "x": 1330,
-        "y": 400,
+        "y": 240,
         "wires": [
             [
                 "0afa7e0d1a6a1ee0"
@@ -263,7 +265,7 @@
         "to": "",
         "reg": false,
         "x": 950,
-        "y": 320,
+        "y": 160,
         "wires": [
             [
                 "aa1c4dcaa68e3bca"
@@ -290,7 +292,7 @@
         "to": "",
         "reg": false,
         "x": 1140,
-        "y": 320,
+        "y": 160,
         "wires": [
             [
                 "967ae89b1a6f69ba"
@@ -314,7 +316,7 @@
         "senderr": false,
         "headers": [],
         "x": 1330,
-        "y": 320,
+        "y": 160,
         "wires": [
             [
                 "15f31b1a3a46cb0f"
@@ -333,7 +335,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1060,
+        "x": 1180,
         "y": 720,
         "wires": [
             [
@@ -357,7 +359,7 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 1270,
+        "x": 1390,
         "y": 720,
         "wires": [
             [
@@ -379,7 +381,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1500,
-        "y": 320,
+        "y": 160,
         "wires": []
     },
     {
@@ -396,7 +398,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1500,
-        "y": 400,
+        "y": 240,
         "wires": []
     },
     {
@@ -411,8 +413,738 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1440,
+        "x": 1560,
         "y": 720,
+        "wires": []
+    },
+    {
+        "id": "c6e473259cb78185",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Update Fleet State (Dashboard)",
+        "func": "let fleet = flow.get(\"fleet\") || {};\n\nconst p = msg.payload;\nconst id = p.vehicle_id;\n\nfleet[id] = fleet[id] || {};\nfleet[id].vehicle_id = id;\nfleet[id].speed = Number(p.speed);\nfleet[id].latitude = Number(p.latitude);\nfleet[id].longitude = Number(p.longitude);\nfleet[id].timestamp = p.timestamp;\n\n// IMPORTANT: update last seen\nfleet[id].last_seen_ms = Date.now();\n\n// Keep status (your overspeed logic)\nfleet[id].status = (fleet[id].speed > 120) ? \"OVERSPEED\" : \"NORMAL\";\n\nflow.set(\"fleet\", fleet);\n\n// Output array for table/map\nmsg.payload = Object.values(fleet);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 800,
+        "wires": [
+            [
+                "8b8926d6aa77be6e",
+                "f96fa0f4605a4787",
+                "76cc25a0431c3f09",
+                "3bd50ba425bc23ac",
+                "3409c55a7f55c35b"
+            ]
+        ]
+    },
+    {
+        "id": "8b8926d6aa77be6e",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Compute Fleet KPIs",
+        "func": "const arr = msg.payload || [];\nconst total = arr.length;\nconst overspeed = arr.filter(v => v.status === \"OVERSPEED\").length;\nconst latest = arr.length ? arr.map(v => v.timestamp).sort().slice(-1)[0] : \"N/A\";\n\nmsg.payload = { total, overspeed, latest };\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1020,
+        "y": 800,
+        "wires": [
+            [
+                "21f922f12977a6e7",
+                "04781cc034b03dbf",
+                "3061932db7f3287d"
+            ]
+        ]
+    },
+    {
+        "id": "21f922f12977a6e7",
+        "type": "ui-text",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "67ba2a694d7cbeb5",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Total Vehicles",
+        "label": "Total Vehicles",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.total",
+        "valueType": "msg",
+        "x": 1280,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "04781cc034b03dbf",
+        "type": "ui-text",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "67ba2a694d7cbeb5",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Overspeed vehicles",
+        "label": "Overspeed Vehicles",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.overspeed",
+        "valueType": "msg",
+        "x": 1290,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "3061932db7f3287d",
+        "type": "ui-text",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "67ba2a694d7cbeb5",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "Latest Update",
+        "label": "Latest Update",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.latest",
+        "valueType": "msg",
+        "x": 1280,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "f96fa0f4605a4787",
+        "type": "ui-table",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "47b6b71817dc6797",
+        "name": "Fleet Table (live)",
+        "label": "",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "maxrows": "200",
+        "passthru": false,
+        "autocols": true,
+        "showSearch": true,
+        "deselect": true,
+        "selectionType": "none",
+        "columns": [],
+        "mobileBreakpoint": "sm",
+        "mobileBreakpointType": "defaults",
+        "action": "replace",
+        "className": "",
+        "x": 1020,
+        "y": 880,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "76cc25a0431c3f09",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Build Vehicle Dropdown Options",
+        "func": "const vehicles = (msg.payload || []).map(v => v.vehicle_id).sort();\n\nmsg.options = vehicles.map(id => ({ value: id, label: id }));\n\nlet selected = flow.get(\"selected_vehicle\");\nif (!selected || !vehicles.includes(selected)) {\n  selected = vehicles[0] || \"VEHICLE_001\";\n  flow.set(\"selected_vehicle\", selected);\n}\n\nmsg.payload = selected;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 1000,
+        "wires": [
+            [
+                "b094358da5b6daf6"
+            ]
+        ]
+    },
+    {
+        "id": "b094358da5b6daf6",
+        "type": "ui-dropdown",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "b833157d89f3e28f",
+        "name": "Vehicle Dropdown",
+        "label": "Select Vehicle:",
+        "tooltip": "",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "multiple": false,
+        "chips": false,
+        "clearable": false,
+        "options": [
+            {
+                "label": "",
+                "value": "",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "typeIsComboBox": true,
+        "msgTrigger": "onChange",
+        "x": 1290,
+        "y": 1000,
+        "wires": [
+            [
+                "a0cb18d8e6f9ceae"
+            ]
+        ]
+    },
+    {
+        "id": "a0cb18d8e6f9ceae",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Set Selected Vehicle",
+        "func": "// Stores the currently selected vehicle in flow context\nflow.set(\"selected_vehicle\", msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1520,
+        "y": 1000,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3bd50ba425bc23ac",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Get Selected Vehicle Live Data",
+        "func": "const fleet = flow.get(\"fleet\") || {};\nconst selected = flow.get(\"selected_vehicle\") || \"VEHICLE_001\";\n\nconst v = fleet[selected];\n\nif (!v) {\n  msg.speed = 0;\n  msg.statusText = `${selected} | No telemetry yet`;\n  msg.vehicle = null;\n  return msg;\n}\n\nmsg.vehicle = v;\nmsg.speed = v.speed;\nmsg.statusText = `${selected} | ${v.status} | ${v.timestamp}`;\n\n// For charts\nmsg.topic = selected;\nmsg.payload = v.speed;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1030,
+        "y": 1100,
+        "wires": [
+            [
+                "68653f67ccf2e304",
+                "0a586d8212e3f391",
+                "e4b0bdfa703ffd3a"
+            ]
+        ]
+    },
+    {
+        "id": "68653f67ccf2e304",
+        "type": "ui-gauge",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Speed Gauge",
+        "group": "f8ab1ba8cd84eba8",
+        "order": 2,
+        "value": "payload",
+        "valueType": "msg",
+        "width": 3,
+        "height": 3,
+        "gtype": "gauge-half",
+        "gstyle": "needle",
+        "title": "Speed",
+        "alwaysShowTitle": false,
+        "floatingTitlePosition": "top-left",
+        "units": "km/h",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "0",
+                "color": "#5cd65c",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "4",
+                "color": "#ffc800",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "7",
+                "color": "#ea5353",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": 0,
+        "max": "160",
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 1300,
+        "y": 1100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0a586d8212e3f391",
+        "type": "ui-text",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "f8ab1ba8cd84eba8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Status Text",
+        "label": "Status",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "statusText",
+        "valueType": "msg",
+        "x": 1310,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "e4b0bdfa703ffd3a",
+        "type": "ui-chart",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "b97add259f471fe9",
+        "name": "Live Speed Chart",
+        "label": "Live Speed",
+        "order": 1,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "",
+        "ymax": "",
+        "bins": 10,
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "circle",
+        "pointRadius": 4,
+        "showLegend": true,
+        "removeOlder": 1,
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#0095ff",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": 6,
+        "height": 8,
+        "className": "",
+        "interpolation": "linear",
+        "x": 1310,
+        "y": 1220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3409c55a7f55c35b",
+        "type": "ui-template",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "7a7870ba3b62ea34",
+        "page": "",
+        "ui": "",
+        "name": "Fleet Map",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n  <div id=\"fleetMap\" style=\"height: 550px; width: 100%; border-radius: 12px;\"></div>\n</template>\n\n<script>\nexport default {\n  data() {\n    return {\n      map: null,\n      markers: {}\n    };\n  },\n\n  mounted() {\n    // Load Leaflet dynamically once the component mounts\n    const css = document.createElement(\"link\");\n    css.rel = \"stylesheet\";\n    css.href = \"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\";\n    document.head.appendChild(css);\n\n    const script = document.createElement(\"script\");\n    script.src = \"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\";\n    script.onload = () => {\n      this.initMap();\n      // In case first msg already arrived before leaflet loaded\n      this.updateMarkersFromMsg();\n    };\n    document.head.appendChild(script);\n  },\n\n  watch: {\n    msg: {\n      handler() {\n        this.updateMarkersFromMsg();\n      },\n      deep: true\n    }\n  },\n\n  methods: {\n    initMap() {\n      if (this.map || !window.L) return;\n\n      this.map = window.L.map(\"fleetMap\").setView([25.276987, 55.296249], 11);\n\n      window.L.tileLayer(\"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\", {\n        maxZoom: 19,\n        attribution: \"&copy; OpenStreetMap\"\n      }).addTo(this.map);\n\n      // Fix blank map due to hidden render/layout\n      setTimeout(() => this.map.invalidateSize(), 300);\n    },\n\n    upsertMarker(v) {\n      if (!this.map || !window.L) return;\n\n      const id = v.vehicle_id;\n      const lat = Number(v.latitude);\n      const lon = Number(v.longitude);\n\n      if (Number.isNaN(lat) || Number.isNaN(lon)) return;\n\n      const popup = `\n        <b>${id}</b><br/>\n        Speed: ${v.speed} km/h<br/>\n        Status: ${v.status}<br/>\n        Time: ${v.timestamp}\n      `;\n\n      if (!this.markers[id]) {\n        this.markers[id] = window.L.marker([lat, lon])\n          .addTo(this.map)\n          .bindPopup(popup);\n      } else {\n        this.markers[id].setLatLng([lat, lon]).setPopupContent(popup);\n      }\n    },\n\n    updateMarkersFromMsg() {\n      // msg is provided by Dashboard 2 automatically\n      const vehicles = (this.msg && this.msg.payload) ? this.msg.payload : [];\n\n      // Ensure map is initialized once Leaflet is ready\n      this.initMap();\n\n      // Update all markers\n      vehicles.forEach(v => this.upsertMarker(v));\n    }\n  }\n};\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 960,
+        "y": 1180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a44a4af2ab064245",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Store recent Alerts",
+        "func": "let alerts = flow.get(\"alerts\") || [];\n\nalerts.unshift(msg.payload);\n\nalerts = alerts.slice(0, 10);\n\nflow.set(\"alerts\", alerts);\n\n// Output array for UI list/table\nmsg.payload = alerts;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1190,
+        "y": 480,
+        "wires": [
+            [
+                "200142ec0fe46333",
+                "dcd0e3ba26cf6c8d"
+            ]
+        ]
+    },
+    {
+        "id": "200142ec0fe46333",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Alert KPIs",
+        "func": "const alerts = msg.payload || [];\n\nmsg.payload = {\n  count: alerts.length,\n  latest: alerts.length\n    ? `${alerts[0].vehicle_id} @ ${alerts[0].speed} km/h (${alerts[0].timestamp})`\n    : \"N/A\"\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1680,
+        "y": 480,
+        "wires": [
+            [
+                "51f53aa0cc3d4011",
+                "6361b099768ff5c5"
+            ]
+        ]
+    },
+    {
+        "id": "51f53aa0cc3d4011",
+        "type": "ui-text",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "0d057aa2a823bda6",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Count Widget",
+        "label": "Recent Alerts (last 10)",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.count",
+        "valueType": "msg",
+        "x": 1880,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "6361b099768ff5c5",
+        "type": "ui-text",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "0d057aa2a823bda6",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "Latest Alert Widget",
+        "label": "Latest Alert",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.latest",
+        "valueType": "msg",
+        "x": 1870,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "dcd0e3ba26cf6c8d",
+        "type": "ui-template",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "709acc5741138eac",
+        "page": "",
+        "ui": "",
+        "name": "Recent Alerts List",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n  <div style=\"padding:10px;\">\n    <h3 style=\"margin:0 0 10px 0;\">Recent Overspeed Alerts</h3>\n    <div v-if=\"!msg || !msg.payload || msg.payload.length === 0\">\n      No alerts yet.\n    </div>\n\n    <ol v-else>\n      <li v-for=\"(a, idx) in msg.payload\" :key=\"idx\" style=\"margin-bottom:6px;\">\n        <b>{{a.vehicle_id}}</b>\n        — <span :style=\"{fontWeight:'600'}\">{{a.speed}} km/h</span>\n        (thr {{a.threshold}})\n        — <span style=\"opacity:0.8;\">{{a.timestamp}}</span>\n      </li>\n    </ol>\n  </div>\n</template>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1890,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "260f9eaf042bbc03",
+        "type": "ui-button",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "0d057aa2a823bda6",
+        "name": "Clear Alerts",
+        "label": "Clear Alerts",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "clear",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 1420,
+        "y": 620,
+        "wires": [
+            [
+                "3db22ad810cfc718"
+            ]
+        ]
+    },
+    {
+        "id": "3db22ad810cfc718",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Clear Alerts Action",
+        "func": "flow.set(\"alerts\", []);\nmsg.payload = [];\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1630,
+        "y": 620,
+        "wires": [
+            [
+                "dcd0e3ba26cf6c8d"
+            ]
+        ]
+    },
+    {
+        "id": "79f82dd38264ab6a",
+        "type": "inject",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Connection check tick",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "5",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 430,
+        "y": 940,
+        "wires": [
+            [
+                "5ddb3f640b55dc15"
+            ]
+        ]
+    },
+    {
+        "id": "5ddb3f640b55dc15",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Refresh Connection Status",
+        "func": "let fleet = flow.get(\"fleet\") || {};\nconst now = Date.now();\n\n// threshold: 15 seconds\nconst THRESHOLD_MS = 15000;\n\nfor (const id in fleet) {\n  const last = fleet[id].last_seen_ms || 0;\n  fleet[id].connection = (now - last <= THRESHOLD_MS) ? \"CONNECTED\" : \"DISCONNECTED\";\n}\n\nflow.set(\"fleet\", fleet);\n\n// output array for table/map updates\nmsg.payload = Object.values(fleet);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 940,
+        "wires": [
+            [
+                "f96fa0f4605a4787",
+                "3409c55a7f55c35b"
+            ]
+        ]
+    },
+    {
+        "id": "7dba8a941e60adf9",
+        "type": "ui-button",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "b833157d89f3e28f",
+        "name": "Send Slow down",
+        "label": "Send Slow Down",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "SLOW_DOWN",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 670,
+        "y": 460,
+        "wires": [
+            [
+                "65c93f8903fbb5bd"
+            ]
+        ]
+    },
+    {
+        "id": "65c93f8903fbb5bd",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Build Command Message",
+        "func": "const selected = flow.get(\"selected_vehicle\") || \"VEHICLE_001\";\n\nmsg.topic = `fleet/vehicle/${selected}/command`;\n\nmsg.payload = {\n  command: \"SLOW_DOWN\",\n  target_speed: 80,\n  issued_at: new Date().toISOString()\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 460,
+        "wires": [
+            [
+                "6dfa23eb416e9b54",
+                "52aeb5d839e2dfb4",
+                "1f08c27a28e029e2"
+            ]
+        ]
+    },
+    {
+        "id": "1f08c27a28e029e2",
+        "type": "debug",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1180,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "52aeb5d839e2dfb4",
+        "type": "ui-text",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "b833157d89f3e28f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Build Command Message",
+        "label": "Last Command",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.command",
+        "valueType": "msg",
+        "x": 1230,
+        "y": 340,
         "wires": []
     },
     {
@@ -478,5 +1210,308 @@
         "willMsg": {},
         "userProps": "",
         "sessionExpiry": ""
+    },
+    {
+        "id": "67ba2a694d7cbeb5",
+        "type": "ui-group",
+        "name": "KPIs",
+        "page": "28486bf1cd52b9be",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "47b6b71817dc6797",
+        "type": "ui-group",
+        "name": "Fleet Status Table",
+        "page": "28486bf1cd52b9be",
+        "width": 6,
+        "height": 1,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "b833157d89f3e28f",
+        "type": "ui-group",
+        "name": "Controls",
+        "page": "9a02dbbe8ffb1ec7",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "f8ab1ba8cd84eba8",
+        "type": "ui-group",
+        "name": "Live Metrics",
+        "page": "9a02dbbe8ffb1ec7",
+        "width": 6,
+        "height": 1,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "b97add259f471fe9",
+        "type": "ui-group",
+        "name": "Live Chart",
+        "page": "9a02dbbe8ffb1ec7",
+        "width": 6,
+        "height": 1,
+        "order": 3,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "7a7870ba3b62ea34",
+        "type": "ui-group",
+        "name": "Fleet Map",
+        "page": "9aea52833feb21d9",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "0d057aa2a823bda6",
+        "type": "ui-group",
+        "name": "Overspeed KPIs",
+        "page": "2fe1673ada5547c1",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "709acc5741138eac",
+        "type": "ui-group",
+        "name": "Recent Alerts",
+        "page": "2fe1673ada5547c1",
+        "width": 6,
+        "height": 1,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "28486bf1cd52b9be",
+        "type": "ui-page",
+        "name": "Fleet Overview",
+        "ui": "50a308027429d1a1",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "a4880d0e5ad7ae1f",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "9a02dbbe8ffb1ec7",
+        "type": "ui-page",
+        "name": "Vehicle Details",
+        "ui": "50a308027429d1a1",
+        "path": "/page2",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "a4880d0e5ad7ae1f",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 2,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "9aea52833feb21d9",
+        "type": "ui-page",
+        "name": "Map",
+        "ui": "50a308027429d1a1",
+        "path": "/page3",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "a4880d0e5ad7ae1f",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 3,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "2fe1673ada5547c1",
+        "type": "ui-page",
+        "name": "Alerts",
+        "ui": "50a308027429d1a1",
+        "path": "/page4",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "a4880d0e5ad7ae1f",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 4,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "50a308027429d1a1",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "a4880d0e5ad7ae1f",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "2144c2d8677dffcf",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
     }
 ]

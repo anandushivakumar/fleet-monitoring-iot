@@ -590,7 +590,7 @@
         "name": "Vehicle Dropdown",
         "label": "Select Vehicle:",
         "tooltip": "",
-        "order": 3,
+        "order": 5,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -641,7 +641,7 @@
         "type": "function",
         "z": "43a1d45bd1f2ab4b",
         "name": "Get Selected Vehicle Live Data",
-        "func": "const fleet = flow.get(\"fleet\") || {};\nconst selected = flow.get(\"selected_vehicle\") || \"VEHICLE_001\";\n\nconst v = fleet[selected];\n\nif (!v) {\n  msg.speed = 0;\n  msg.statusText = `${selected} | No telemetry yet`;\n  msg.vehicle = null;\n  return msg;\n}\n\nmsg.vehicle = v;\nmsg.speed = v.speed;\nmsg.statusText = `${selected} | ${v.status} | ${v.timestamp}`;\n\n// For charts\nmsg.topic = selected;\nmsg.payload = v.speed;\nreturn msg;",
+        "func": "const fleet = flow.get(\"fleet\") || {};\nconst selected = flow.get(\"selected_vehicle\") || \"VEHICLE_001\";\n\nconst v = fleet[selected];\n\n\nif (!v) {\n  msg.speed = 0;\n  msg.statusText = `${selected} | No telemetry yet`;\n  msg.vehicle = null;\n  return msg;\n}\n\nmsg.vehicle = v;\nmsg.speed = v.speed;\nmsg.statusText = `${selected} | ${v.status} | ${v.timestamp}`;\n\n// For charts\nmsg.topic = selected;\nmsg.payload = v.speed;\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -930,8 +930,8 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 1890,
-        "y": 620,
+        "x": 1870,
+        "y": 600,
         "wires": [
             []
         ]
@@ -967,8 +967,8 @@
         "enablePointerup": false,
         "pointerupPayload": "",
         "pointerupPayloadType": "str",
-        "x": 1420,
-        "y": 620,
+        "x": 1430,
+        "y": 640,
         "wires": [
             [
                 "3db22ad810cfc718"
@@ -988,7 +988,7 @@
         "finalize": "",
         "libs": [],
         "x": 1630,
-        "y": 620,
+        "y": 640,
         "wires": [
             [
                 "dcd0e3ba26cf6c8d"
@@ -1052,7 +1052,7 @@
         "group": "b833157d89f3e28f",
         "name": "Send Slow down",
         "label": "Send Slow Down",
-        "order": 2,
+        "order": 4,
         "width": 0,
         "height": 0,
         "emulateClick": false,
@@ -1128,7 +1128,7 @@
         "type": "ui-text",
         "z": "43a1d45bd1f2ab4b",
         "group": "b833157d89f3e28f",
-        "order": 1,
+        "order": 3,
         "width": 0,
         "height": 0,
         "name": "Build Command Message",
@@ -1145,6 +1145,281 @@
         "valueType": "msg",
         "x": 1230,
         "y": 340,
+        "wires": []
+    },
+    {
+        "id": "32f72d7dabed6c89",
+        "type": "ui-number-input",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "b833157d89f3e28f",
+        "name": "Number of points",
+        "label": "History Points",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "topic": "topic",
+        "topicType": "msg",
+        "min": "10",
+        "max": "300",
+        "step": 1,
+        "tooltip": "",
+        "delay": 300,
+        "passthru": true,
+        "sendOnDelay": false,
+        "sendOnBlur": true,
+        "sendOnEnter": true,
+        "className": "",
+        "clearable": false,
+        "icon": "",
+        "iconPosition": "left",
+        "iconInnerPosition": "inside",
+        "spinner": "default",
+        "x": 450,
+        "y": 1340,
+        "wires": [
+            [
+                "fcb4646f9fd7d37f"
+            ]
+        ]
+    },
+    {
+        "id": "fcb4646f9fd7d37f",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Storing number",
+        "func": "flow.set(\"history_limit\", Number(msg.payload) || 50);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 1340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b8c472c7484724f8",
+        "type": "ui-button",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "b833157d89f3e28f",
+        "name": "Load History Button",
+        "label": "Load History",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "load",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 900,
+        "y": 1340,
+        "wires": [
+            [
+                "1d119321061d1322"
+            ]
+        ]
+    },
+    {
+        "id": "1d119321061d1322",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Build Firebase History URL",
+        "func": "const BASE = \"https://fleet-monitoring-iot-default-rtdb.asia-southeast1.firebasedatabase.app\";\n\nconst selected = flow.get(\"selected_vehicle\") || \"VEHICLE_001\";\nconst limit = flow.get(\"history_limit\") || 50;\n\nmsg.url = `${BASE}/fleet/telemetry/${selected}.json?orderBy=\"$key\"&limitToLast=${limit}`;\n\nmsg.selected_vehicle = selected;\nmsg.history_limit = limit;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1140,
+        "y": 1340,
+        "wires": [
+            [
+                "6116a47585a43135"
+            ]
+        ]
+    },
+    {
+        "id": "6116a47585a43135",
+        "type": "http request",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1360,
+        "y": 1340,
+        "wires": [
+            [
+                "24611e52dcb8b446"
+            ]
+        ]
+    },
+    {
+        "id": "24611e52dcb8b446",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Convert history to chart",
+        "func": "const selected = msg.selected_vehicle || (flow.get(\"selected_vehicle\") || \"VEHICLE_001\");\nconst obj = msg.payload || {};\n\nlet arr = Object.keys(obj).map(k => obj[k]);\n\narr = arr\n  .filter(p => p && p.timestamp && p.speed !== undefined)\n  .map(p => ({\n    t: new Date(p.timestamp).getTime(),\n    s: Number(p.speed)\n  }))\n  .sort((a, b) => a.t - b.t);\n\nmsg.topic = `HISTORY-${selected}`;\nmsg.payload = arr;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1570,
+        "y": 1340,
+        "wires": [
+            [
+                "4909eed269d46442"
+            ]
+        ]
+    },
+    {
+        "id": "b17f5aecc2c8fffa",
+        "type": "ui-chart",
+        "z": "43a1d45bd1f2ab4b",
+        "group": "7583b2d001d3f526",
+        "name": "Speed history chart",
+        "label": "Speed History (Firebase)",
+        "order": 1,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "",
+        "ymax": "",
+        "bins": 10,
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "circle",
+        "pointRadius": 4,
+        "showLegend": true,
+        "removeOlder": 1,
+        "removeOlderUnit": "604800",
+        "removeOlderPoints": "",
+        "colors": [
+            "#0095ff",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": 6,
+        "height": 8,
+        "className": "",
+        "interpolation": "linear",
+        "x": 2250,
+        "y": 1220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4909eed269d46442",
+        "type": "split",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "split points to individual messages",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 1780,
+        "y": 1400,
+        "wires": [
+            [
+                "58debdbbb5891143"
+            ]
+        ]
+    },
+    {
+        "id": "58debdbbb5891143",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Format History Point",
+        "func": "const pt = msg.payload;\n\nmsg.payload = Number(pt.s);\nmsg.timestamp = Number(pt.t);\nmsg.topic = msg.topic || (flow.get(\"selected_vehicle\") || \"VEHICLE_001\");\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2000,
+        "y": 1320,
+        "wires": [
+            [
+                "b17f5aecc2c8fffa",
+                "415ca9819cf2364a"
+            ]
+        ]
+    },
+    {
+        "id": "415ca9819cf2364a",
+        "type": "debug",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "debug 8",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2220,
+        "y": 1380,
         "wires": []
     },
     {
@@ -1317,6 +1592,20 @@
         "width": 6,
         "height": 1,
         "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "7583b2d001d3f526",
+        "type": "ui-group",
+        "name": "History Chart",
+        "page": "9a02dbbe8ffb1ec7",
+        "width": 6,
+        "height": 1,
+        "order": 4,
         "showTitle": true,
         "className": "",
         "visible": "true",
@@ -1507,7 +1796,7 @@
         }
     },
     {
-        "id": "2144c2d8677dffcf",
+        "id": "aa1bf5a3715094d0",
         "type": "global-config",
         "env": [],
         "modules": {

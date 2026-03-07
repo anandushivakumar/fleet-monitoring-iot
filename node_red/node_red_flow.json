@@ -20,7 +20,7 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 240,
+        "x": 140,
         "y": 660,
         "wires": [
             [
@@ -36,14 +36,11 @@
         "property": "payload",
         "action": "",
         "pretty": false,
-        "x": 450,
+        "x": 330,
         "y": 660,
         "wires": [
             [
-                "5fd3b9e0620ebe15",
-                "5af85dfa6cb04637",
-                "3d3af01ca9c229a6",
-                "c6e473259cb78185"
+                "66dc0cd38e506d1d"
             ]
         ]
     },
@@ -422,7 +419,7 @@
         "type": "function",
         "z": "43a1d45bd1f2ab4b",
         "name": "Update Fleet State (Dashboard)",
-        "func": "let fleet = flow.get(\"fleet\") || {};\n\nconst p = msg.payload;\nconst id = p.vehicle_id;\n\nfleet[id] = fleet[id] || {};\nfleet[id].vehicle_id = id;\nfleet[id].speed = Number(p.speed);\nfleet[id].latitude = Number(p.latitude);\nfleet[id].longitude = Number(p.longitude);\nfleet[id].timestamp = p.timestamp;\n\n// IMPORTANT: update last seen\nfleet[id].last_seen_ms = Date.now();\n\n// Keep status (your overspeed logic)\nfleet[id].status = (fleet[id].speed > 120) ? \"OVERSPEED\" : \"NORMAL\";\n\nflow.set(\"fleet\", fleet);\n\n// Output array for table/map\nmsg.payload = Object.values(fleet);\nreturn msg;",
+        "func": "let fleet = flow.get(\"fleet\") || {};\n\nconst p = msg.payload;\nconst id = p.vehicle_id;\n\nif (!id) return null;\n\nfleet[id] = fleet[id] || {};\nfleet[id].vehicle_id = id;\n\n// Validate telemetry fields\nconst speed = Number(p.speed);\nconst lat = Number(p.latitude);\nconst lon = Number(p.longitude);\n\nif (isNaN(speed) || isNaN(lat) || isNaN(lon) || !p.timestamp) {\n    fleet[id].status = \"INVALID\";\n} else {\n    fleet[id].speed = speed;\n    fleet[id].latitude = lat;\n    fleet[id].longitude = lon;\n    fleet[id].timestamp = p.timestamp;\n    fleet[id].last_seen_ms = Date.now();\n    fleet[id].status = (speed > 120) ? \"OVERSPEED\" : \"NORMAL\";\n}\n\nflow.set(\"fleet\", fleet);\n\nmsg.payload = Object.values(fleet);\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1423,6 +1420,47 @@
         "wires": []
     },
     {
+        "id": "66dc0cd38e506d1d",
+        "type": "function",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "Latency Check",
+        "func": "const simulatorTime = new Date(msg.payload.timestamp).getTime();\nconst now = Date.now();\n\nmsg.latency_ms = now - simulatorTime;\n\nnode.warn(\"Latency: \" + msg.latency_ms + \" ms\");\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 270,
+        "y": 540,
+        "wires": [
+            [
+                "3d3af01ca9c229a6",
+                "5fd3b9e0620ebe15",
+                "5af85dfa6cb04637",
+                "c6e473259cb78185",
+                "7c5edd56432f6611"
+            ]
+        ]
+    },
+    {
+        "id": "7c5edd56432f6611",
+        "type": "debug",
+        "z": "43a1d45bd1f2ab4b",
+        "name": "debug 7",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "latency_ms",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 280,
+        "y": 380,
+        "wires": []
+    },
+    {
         "id": "b84c3fdc3d5601dc",
         "type": "mqtt-broker",
         "name": "HiveMQ_TLS_8883",
@@ -1796,7 +1834,7 @@
         }
     },
     {
-        "id": "aa1bf5a3715094d0",
+        "id": "3ef223f557e698e8",
         "type": "global-config",
         "env": [],
         "modules": {

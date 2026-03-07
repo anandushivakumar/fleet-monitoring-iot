@@ -4,8 +4,8 @@ import json
 from datetime import datetime, timezone
 from mqtt_client import MQTTClient
 
-NUM_VEHICLES = 3
-PUBLISH_INTERVAL = 5
+NUM_VEHICLES = 10
+PUBLISH_INTERVAL = 15
 
 BASE_LAT = 25.276987
 BASE_LON = 55.296249
@@ -58,16 +58,18 @@ def on_command(topic: str, payload: dict):
     cap = float(payload.get("target_speed", SLOWDOWN_DEFAULT_TARGET))
     duration = int(payload.get("duration_sec", SLOWDOWN_DEFAULT_DURATION))
     speed_caps[vehicle_id] = {"cap": cap, "until": time.time() + duration}
-    print(f"[COMMAND] {vehicle_id} SLOW_DOWN -> {cap} for {duration}s")
+    print(f"[COMMAND] {vehicle_id} SLOW_DOWN -> {cap} for {duration}s", flush=True)
 
 
 def main():
     mqtt_client = MQTTClient(on_message_callback=on_command)
     mqtt_client.connect()
-
     mqtt_client.subscribe("fleet/vehicle/+/command")
 
     vehicle_ids = [f"VEHICLE_{i+1:03d}" for i in range(NUM_VEHICLES)]
+
+    print("Simulator started", flush=True)
+    print(f"Publishing {NUM_VEHICLES} vehicles every {PUBLISH_INTERVAL} seconds", flush=True)
 
     try:
         while True:
@@ -78,12 +80,12 @@ def main():
                 payload = json.dumps(data)
 
                 mqtt_client.publish(topic, payload)
-                print(f"Published → {topic}")
+                print(f"Published → {topic} | {payload}", flush=True)
 
             time.sleep(PUBLISH_INTERVAL)
 
     except KeyboardInterrupt:
-        print("\nStopping simulator...")
+        print("\nStopping simulator...", flush=True)
         mqtt_client.disconnect()
 
 

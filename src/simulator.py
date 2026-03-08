@@ -4,8 +4,8 @@ import json
 from datetime import datetime, timezone
 from mqtt_client import MQTTClient
 
-NUM_VEHICLES = 10
-PUBLISH_INTERVAL = 15
+NUM_VEHICLES = 3
+PUBLISH_INTERVAL = 5
 
 BASE_LAT = 25.276987
 BASE_LON = 55.296249

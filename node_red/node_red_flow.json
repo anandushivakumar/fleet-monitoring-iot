@@ -1285,7 +1285,7 @@
         "type": "function",
         "z": "43a1d45bd1f2ab4b",
         "name": "Convert history to chart",
-        "func": "const selected = msg.selected_vehicle || (flow.get(\"selected_vehicle\") || \"VEHICLE_001\");\nconst obj = msg.payload || {};\n\nlet arr = Object.keys(obj).map(k => obj[k]);\n\narr = arr\n  .filter(p => p && p.timestamp && p.speed !== undefined)\n  .map(p => ({\n    t: new Date(p.timestamp).getTime(),\n    s: Number(p.speed)\n  }))\n  .sort((a, b) => a.t - b.t);\n\nmsg.topic = `HISTORY-${selected}`;\nmsg.payload = arr;\n\nreturn msg;",
+        "func": "const selected = msg.selected_vehicle || (flow.get(\"selected_vehicle\") || \"VEHICLE_001\");\nconst obj = msg.payload || {};\n\nlet arr = Object.keys(obj).map(k => obj[k]);\n\narr = arr\n  .filter(p => p && p.timestamp && p.speed !== undefined)\n  .map(p => ({\n    history_ts: new Date(p.timestamp).getTime(),\n    speed: Number(p.speed)\n  }))\n  .sort((a, b) => a.history_ts - b.history_ts);\n\nmsg.topic = `HISTORY-${selected}`;\nmsg.payload = arr;\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1312,8 +1312,8 @@
         "category": "topic",
         "categoryType": "msg",
         "xAxisLabel": "",
-        "xAxisProperty": "",
-        "xAxisPropertyType": "timestamp",
+        "xAxisProperty": "history_ts",
+        "xAxisPropertyType": "msg",
         "xAxisType": "time",
         "xAxisFormat": "",
         "xAxisFormatType": "auto",
@@ -1387,7 +1387,7 @@
         "type": "function",
         "z": "43a1d45bd1f2ab4b",
         "name": "Format History Point",
-        "func": "const pt = msg.payload;\n\nmsg.payload = Number(pt.s);\nmsg.timestamp = Number(pt.t);\nmsg.topic = msg.topic || (flow.get(\"selected_vehicle\") || \"VEHICLE_001\");\n\nreturn msg;",
+        "func": "const pt = msg.payload;\n\nmsg.payload = Number(pt.speed);\nmsg.history_ts = Number(pt.history_ts);\nmsg.topic = msg.topic || (flow.get(\"selected_vehicle\") || \"VEHICLE_001\");\n\ndelete msg.timestamp;\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1412,7 +1412,8 @@
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "true",
+        "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
         "x": 2220,
@@ -1435,11 +1436,11 @@
         "y": 540,
         "wires": [
             [
+                "7c5edd56432f6611",
                 "3d3af01ca9c229a6",
                 "5fd3b9e0620ebe15",
                 "5af85dfa6cb04637",
-                "c6e473259cb78185",
-                "7c5edd56432f6611"
+                "c6e473259cb78185"
             ]
         ]
     },
@@ -1834,7 +1835,7 @@
         }
     },
     {
-        "id": "3ef223f557e698e8",
+        "id": "c3e356b5dd177e22",
         "type": "global-config",
         "env": [],
         "modules": {
